@@ -1,6 +1,7 @@
 "use client";
 
 import TrueFalseIcon from "@/components/common/TrueFalseIcon";
+import ActionSection from "@/components/tams/actions/ActionSection";
 import EditSection from "@/components/tams/settings/EditSection";
 import { AccountMetadata } from "@/utils/app.type";
 import * as Accordion from "@radix-ui/react-accordion";
@@ -208,6 +209,9 @@ const TamsPage = () => {
                           </div>
                           <div className="p-4 border border-slate-200">
                             <EditSection accountMetadata={data} />
+                          </div>
+                          <div className="p-4 border border-slate-200">
+                            <ActionSection />
                           </div>
                         </div>
                       </Accordion.Content>
