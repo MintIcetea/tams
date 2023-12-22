@@ -1,4 +1,4 @@
-import { EditAccountPayload } from "@/api/tams/account/account.type";
+import { EditAccountPayload } from "@/api/tams/account/type";
 import Button from "@/components/common/Button";
 import { AccountMetadata } from "@/utils/app.type";
 import { useToggle } from "@/utils/hooks/useToggle";

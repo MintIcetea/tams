@@ -3,9 +3,13 @@
 import TrueFalseIcon from "@/components/common/TrueFalseIcon";
 import ActionSection from "@/components/tams/actions/ActionSection";
 import EditSection from "@/components/tams/settings/EditSection";
+import { createUsersUtilsContext } from "@/components/tams/table/UserTableContext";
 import { AccountMetadata } from "@/utils/app.type";
+import { sleep } from "@/utils/time";
 import * as Accordion from "@radix-ui/react-accordion";
 import { useState, useCallback, useEffect, Fragment } from "react";
+import { Toaster } from "react-hot-toast";
+import { createContext } from "vm";
 
 const mockData: AccountMetadata[] = [
   {
@@ -106,10 +110,13 @@ const mockData: AccountMetadata[] = [
   },
 ];
 
+export const UserTableUtilities = createUsersUtilsContext();
+
 const TamsPage = () => {
   const [loaded, setLoaded] = useState(false);
 
   const [activeUser, setActiveUser] = useState("");
+  const [users, setUsers] = useState<AccountMetadata[]>(mockData);
 
   useEffect(() => {
     setLoaded(true);
@@ -126,6 +133,11 @@ const TamsPage = () => {
     },
     [],
   );
+
+  const refresh = useCallback(async () => {
+    await sleep(3000);
+    setUsers((users) => [...users]);
+  }, []);
 
   if (!loaded) {
     return null;
@@ -180,44 +192,52 @@ const TamsPage = () => {
                 </tr>
                 <tr>
                   <td colSpan={100} style={{ padding: 0 }}>
-                    <Accordion.Item value={data.username}>
-                      <Accordion.Header></Accordion.Header>
-                      <Accordion.Content>
-                        <div className="w-full h-full border border-slate-200 grid grid-cols-2">
-                          <div className="border-r border-slate-200 p-4">
-                            <div className="font-semibold mb-4">Endpoints</div>
-                            {data.endpoints.map((endpoint) => (
-                              <div
-                                key={`${data.username}${endpoint.id}`}
-                                className="p-2 mb-2 font-mono bg-gray-200"
-                              >
-                                <div className="mr-1 space-x-2">
-                                  /{endpoint.id} -{" "}
-                                  {endpoint.status.toUpperCase()}
-                                </div>
-                                <div>
-                                  - Limit: {endpoint.remaining}/
-                                  {endpoint.call_limit}
-                                </div>
-                                <div>- Pending: {endpoint.pending}</div>
-                                <div>
-                                  - Errors:{" "}
-                                  <span>{endpoint.error_reason || "none"}</span>
-                                </div>
+                    <UserTableUtilities.Provider
+                      value={{ refreshData: refresh }}
+                    >
+                      <Accordion.Item value={data.username}>
+                        <Accordion.Header></Accordion.Header>
+                        <Accordion.Content>
+                          <div className="w-full h-full border border-slate-200 grid grid-cols-2">
+                            <div className="border-r border-slate-200 p-4">
+                              <div className="font-semibold mb-4">
+                                Endpoints
                               </div>
-                            ))}
-                          </div>
-                          <div className="p-4 border border-slate-200">
-                            <div>
-                              <EditSection accountMetadata={data} />
+                              {data.endpoints.map((endpoint) => (
+                                <div
+                                  key={`${data.username}${endpoint.id}`}
+                                  className="p-2 mb-2 font-mono bg-gray-200"
+                                >
+                                  <div className="mr-1 space-x-2">
+                                    /{endpoint.id} -{" "}
+                                    {endpoint.status.toUpperCase()}
+                                  </div>
+                                  <div>
+                                    - Limit: {endpoint.remaining}/
+                                    {endpoint.call_limit}
+                                  </div>
+                                  <div>- Pending: {endpoint.pending}</div>
+                                  <div>
+                                    - Errors:{" "}
+                                    <span>
+                                      {endpoint.error_reason || "none"}
+                                    </span>
+                                  </div>
+                                </div>
+                              ))}
                             </div>
-                            <div className="mt-4">
-                              <ActionSection />
+                            <div className="p-4 border border-slate-200">
+                              <div>
+                                <EditSection accountMetadata={data} />
+                              </div>
+                              <div className="mt-4">
+                                <ActionSection username={data.username} />
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </Accordion.Content>
-                    </Accordion.Item>
+                        </Accordion.Content>
+                      </Accordion.Item>
+                    </UserTableUtilities.Provider>
                   </td>
                 </tr>
               </Fragment>
@@ -225,6 +245,7 @@ const TamsPage = () => {
           </tbody>
         </table>
       </Accordion.Root>
+      <Toaster />
     </div>
   );
 };
