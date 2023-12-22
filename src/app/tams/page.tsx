@@ -91,15 +91,15 @@ const TamsPage = () => {
     return null;
   }
 
-  console.log(accounts);
-  console.log(bufferAccounts);
-
   return (
     <div className="container mx-auto mt-24">
-      <div>
+      <div className="my-4">
+        <AddAccountButton refreshData={loadData} />
+      </div>
+      <div className="my-4">
         <form onSubmit={handleSubmit(handleSearch)}>
           <div className="grid grid-cols-3 gap-4 my-4">
-            <div className="col-span-2 flex flex-col items-start space-y-2">
+            <div className="flex flex-col items-start space-y-2">
               <input
                 placeholder="Username or email"
                 {...register("query")}
@@ -121,7 +121,6 @@ const TamsPage = () => {
               >
                 Search
               </button>
-              <AddAccountButton refreshData={loadData} />
             </div>
           </div>
         </form>
