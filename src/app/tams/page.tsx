@@ -1,6 +1,5 @@
 "use client";
 
-import Button from "@/components/common/Button";
 import TrueFalseIcon from "@/components/common/TrueFalseIcon";
 import ActionSection from "@/components/tams/actions/ActionSection";
 import AddAccountButton from "@/components/tams/settings/AddAccountBtn";

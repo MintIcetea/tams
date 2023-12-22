@@ -1,6 +1,5 @@
 import { requestAddAccount } from "@/api/tams/account/account";
 import { AddAccountPayload } from "@/api/tams/account/type";
-import { UserTableUtilities } from "@/app/tams/page";
 import Button from "@/components/common/Button";
 import ErrorText from "@/components/common/ErrorText";
 import { useToggle } from "@/utils/hooks/useToggle";
@@ -35,6 +34,7 @@ const AddAccountButton = ({
   const handleCloseForm = useCallback(() => {
     reset();
     closeEditForm();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const {

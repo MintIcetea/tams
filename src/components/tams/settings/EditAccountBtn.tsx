@@ -40,6 +40,7 @@ const EditAccountButton = ({
   const handleCloseForm = useCallback(() => {
     reset();
     closeEditForm();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const { username, email, auto_email_confirmation_code } = metadata;
