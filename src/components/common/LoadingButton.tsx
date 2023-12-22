@@ -8,21 +8,20 @@ import {
 } from "react";
 
 interface LoadingButtonProps {
-  loading: boolean;
   children: ReactNode;
   className?: HTMLAttributes<HTMLDivElement>["className"];
-  onClick?: () => void;
+  onClick?: () => Promise<void>;
 }
 
 const baseText = "Loading...";
 
 const LoadingButton = ({
-  loading,
   children,
   className,
   onClick,
 }: LoadingButtonProps): ReactElement<LoadingButtonProps> => {
   const [waitingText, setWaitingText] = useState(baseText);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!loading) {
@@ -48,10 +47,19 @@ const LoadingButton = ({
     };
   }, [loading]);
 
+  const handleClick = async () => {
+    if (!onClick) {
+      return;
+    }
+
+    setLoading(true);
+    await onClick().finally(() => setLoading(false));
+  };
+
   return (
     <div
       className={clsx("rounded-lg cursor-pointer", className)}
-      onClick={onClick}
+      onClick={handleClick}
     >
       {loading ? (
         <button
