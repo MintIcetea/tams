@@ -1,4 +1,4 @@
-export type HttpMethod = "GET" | "POST" | "PATCH";
+export type HttpMethod = "GET" | "POST" | "PATCH" | "DELETE";
 
 interface RequestConfig {
   path: string;
@@ -47,7 +47,7 @@ export const baseRequest = async (
     signal: controller.signal,
   };
 
-  const timeout = 5000;
+  const timeout = 10000;
   const timeoutId = setTimeout(() => {
     controller.abort();
   }, timeout);

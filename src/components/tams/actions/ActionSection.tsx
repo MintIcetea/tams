@@ -18,29 +18,40 @@ const ActionSection = ({
   const { refreshData } = useContext(UserTableUtilities);
 
   const handleLogin = async () => {
+    toast("Logging in...", { icon: "⏳" });
+
     const loggedIn = await requestForceLogin(username);
     if (!loggedIn) {
       toast.error("Failed to login. Check log for more info");
+      return;
     }
 
+    toast.success("Login successfully");
     await refreshData();
   };
 
   const handleFlow = async () => {
+    toast("Executing pre-defiend flow...", { icon: "⏳" });
+
     const succeed = await requestFlow(username);
     if (!succeed) {
       toast.error("Failed to execute flow. Check log for more info");
+      return;
     }
 
+    toast.success("Execution done");
     await refreshData();
   };
 
   const handleRefresh = async () => {
+    toast("Refreshing accounts' status...", { icon: "⏳" });
     const succeed = await requestRefresh(username);
     if (!succeed) {
       toast.error("Failed to refresh account status. Check log for more info");
+      return;
     }
 
+    toast.success("Accounts' status refreshed");
     await refreshData();
   };
 

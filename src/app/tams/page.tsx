@@ -2,113 +2,13 @@
 
 import TrueFalseIcon from "@/components/common/TrueFalseIcon";
 import ActionSection from "@/components/tams/actions/ActionSection";
+import AddAccountButton from "@/components/tams/settings/AddAccountBtn";
 import EditSection from "@/components/tams/settings/EditSection";
 import { createUsersUtilsContext } from "@/components/tams/table/UserTableContext";
-import { AccountMetadata } from "@/utils/app.type";
-import { sleep } from "@/utils/time";
+import { useAccounts } from "@/components/tams/table/useAccounts";
 import * as Accordion from "@radix-ui/react-accordion";
 import { useState, useCallback, useEffect, Fragment } from "react";
 import { Toaster } from "react-hot-toast";
-import { createContext } from "vm";
-
-const mockData: AccountMetadata[] = [
-  {
-    username: "ElbertTete41581",
-    email: "sinioritokw@hotmail.com",
-    has_password: true,
-    has_email_password: true,
-    has_cookies: true,
-    status: "logged-in",
-    error_reason: "",
-    auto_email_confirmation_code: true,
-    endpoints: [
-      {
-        id: "following",
-        call_limit: 500,
-        status: "ok",
-        pending: 0,
-        remaining: 499,
-        reset: 1703127992,
-        error_reason: "",
-      },
-      {
-        id: "search-timeline",
-        call_limit: 50,
-        status: "ok",
-        pending: 0,
-        remaining: 49,
-        reset: 1703127992,
-        error_reason: "",
-      },
-      {
-        id: "retweeters",
-        call_limit: 500,
-        status: "ok",
-        pending: 0,
-        remaining: 499,
-        reset: 1703127992,
-        error_reason: "",
-      },
-      {
-        id: "favoriters",
-        call_limit: 500,
-        status: "ok",
-        pending: 0,
-        remaining: 499,
-        reset: 1703127992,
-        error_reason: "",
-      },
-    ],
-  },
-  {
-    username: "EltonSheek74830",
-    email: "ackahauresv@hotmail.com",
-    has_password: true,
-    has_email_password: true,
-    has_cookies: true,
-    status: "logged-in",
-    error_reason: "",
-    auto_email_confirmation_code: true,
-    endpoints: [
-      {
-        id: "search-timeline",
-        call_limit: 50,
-        status: "ok",
-        pending: 0,
-        remaining: 49,
-        reset: 1703127993,
-        error_reason: "",
-      },
-      {
-        id: "retweeters",
-        call_limit: 500,
-        status: "ok",
-        pending: 0,
-        remaining: 499,
-        reset: 1703127993,
-        error_reason: "",
-      },
-      {
-        id: "favoriters",
-        call_limit: 500,
-        status: "ok",
-        pending: 0,
-        remaining: 499,
-        reset: 1703127993,
-        error_reason: "",
-      },
-      {
-        id: "following",
-        call_limit: 500,
-        status: "forbidden",
-        pending: 0,
-        remaining: 499,
-        reset: 1703127993,
-        error_reason: "response status forbidden",
-      },
-    ],
-  },
-];
 
 export const UserTableUtilities = createUsersUtilsContext();
 
@@ -116,7 +16,8 @@ const TamsPage = () => {
   const [loaded, setLoaded] = useState(false);
 
   const [activeUser, setActiveUser] = useState("");
-  const [users, setUsers] = useState<AccountMetadata[]>(mockData);
+
+  const { accounts, loadData } = useAccounts();
 
   useEffect(() => {
     setLoaded(true);
@@ -134,17 +35,15 @@ const TamsPage = () => {
     [],
   );
 
-  const refresh = useCallback(async () => {
-    await sleep(3000);
-    setUsers((users) => [...users]);
-  }, []);
-
   if (!loaded) {
     return null;
   }
 
   return (
     <div className="container mx-auto mt-24">
+      <div className="my-4">
+        <AddAccountButton refreshData={loadData} />
+      </div>
       <Accordion.Root type="single" value={activeUser} collapsible>
         <table className="table-auto w-full h-full border-collapseborder border-slate-400">
           <thead className="tams-thead py-2">
@@ -161,7 +60,7 @@ const TamsPage = () => {
             </tr>
           </thead>
           <tbody className="tams-tbody">
-            {users.map((data) => (
+            {accounts.map((data) => (
               <Fragment key={data.username}>
                 <tr>
                   <td>{data.username}</td>
@@ -193,7 +92,7 @@ const TamsPage = () => {
                 <tr>
                   <td colSpan={100} style={{ padding: 0 }}>
                     <UserTableUtilities.Provider
-                      value={{ refreshData: refresh }}
+                      value={{ refreshData: loadData }}
                     >
                       <Accordion.Item value={data.username}>
                         <Accordion.Header></Accordion.Header>
@@ -245,7 +144,7 @@ const TamsPage = () => {
           </tbody>
         </table>
       </Accordion.Root>
-      <Toaster />
+      <Toaster reverseOrder />
     </div>
   );
 };

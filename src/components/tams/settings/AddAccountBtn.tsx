@@ -1,19 +1,19 @@
-import { requestEditAccount } from "@/api/tams/account/account";
-import { EditAccountPayload } from "@/api/tams/account/type";
+import { requestAddAccount } from "@/api/tams/account/account";
+import { AddAccountPayload } from "@/api/tams/account/type";
 import { UserTableUtilities } from "@/app/tams/page";
 import Button from "@/components/common/Button";
-import { AccountMetadata } from "@/utils/app.type";
+import ErrorText from "@/components/common/ErrorText";
 import { useToggle } from "@/utils/hooks/useToggle";
 import * as AlertDialog from "@radix-ui/react-alert-dialog";
-import { ReactElement, useCallback, useContext } from "react";
+import { ReactElement, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
-interface EditAccountButtonProps {
-  metadata: AccountMetadata;
+interface AddAccountButtonProps {
+  refreshData: () => Promise<void>;
 }
 
-interface EditAccountFormData {
+interface AddAccountFormData {
   username: string;
   password: string;
   email: string;
@@ -21,16 +21,11 @@ interface EditAccountFormData {
   cookies: string;
   autoConfirmCode: boolean;
   tryLogin: boolean;
-  editPassword: boolean;
-  editEmailPassword: boolean;
-  editCookies: boolean;
 }
 
-const EditAccountButton = ({
-  metadata,
-}: EditAccountButtonProps): ReactElement<EditAccountButtonProps> => {
-  const { refreshData } = useContext(UserTableUtilities);
-
+const AddAccountButton = ({
+  refreshData,
+}: AddAccountButtonProps): ReactElement<AddAccountButtonProps> => {
   const {
     isOpen: isEditFormOpen,
     open: openEditForm,
@@ -42,26 +37,26 @@ const EditAccountButton = ({
     closeEditForm();
   }, []);
 
-  const { username, email, auto_email_confirmation_code } = metadata;
-  const { register, reset, watch, handleSubmit } = useForm<EditAccountFormData>(
-    {
-      defaultValues: {
-        username,
-        email,
-        password: "",
-        emailPassword: "",
-        cookies: "",
-        autoConfirmCode: auto_email_confirmation_code,
-        tryLogin: true,
-        editCookies: false,
-        editEmailPassword: false,
-        editPassword: false,
-      },
+  const {
+    register,
+    reset,
+    watch,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<AddAccountFormData>({
+    defaultValues: {
+      username: "",
+      email: "",
+      password: "",
+      emailPassword: "",
+      cookies: "",
+      autoConfirmCode: false,
+      tryLogin: false,
     },
-  );
+  });
 
-  const handleEditAccount = async (data: EditAccountFormData) => {
-    toast("Updating account...", { icon: "⏳" });
+  const handleEditAccount = async (data: AddAccountFormData) => {
+    toast("Adding account...", { icon: "⏳" });
     closeEditForm();
 
     const {
@@ -72,35 +67,26 @@ const EditAccountButton = ({
       cookies,
       autoConfirmCode,
       tryLogin,
-      editPassword,
-      editEmailPassword,
-      editCookies,
     } = data;
 
     // Construct request payload based on user input
-    const payload: EditAccountPayload = {
+    const payload: AddAccountPayload = {
       username,
       email,
       auto_email_confirmation_code: autoConfirmCode,
       try_login: tryLogin,
+      password,
+      email_password: emailPassword,
+      cookies,
     };
-    if (editPassword) {
-      payload.password = password;
-    }
-    if (editEmailPassword) {
-      payload.email_password = emailPassword;
-    }
-    if (editCookies) {
-      payload.cookies = cookies;
-    }
 
-    const succeed = await requestEditAccount(payload, metadata.username);
+    const succeed = await requestAddAccount(payload);
     if (!succeed) {
-      toast.error("Faild to edit account. Check log for more info");
+      toast.error("Faild to add new account. Check log for more info");
       return;
     }
 
-    toast.success("Account edited successfully");
+    toast.success("Account added successfully");
     refreshData();
   };
 
@@ -111,7 +97,7 @@ const EditAccountButton = ({
           className="bg-blue-500 hover:bg-blue-600 text-white"
           onClick={openEditForm}
         >
-          Edit account
+          Add new account
         </Button>
       </AlertDialog.Trigger>
       <AlertDialog.Portal>
@@ -122,7 +108,7 @@ const EditAccountButton = ({
         <form onSubmit={handleSubmit(handleEditAccount)}>
           <AlertDialog.Content className="AlertDialogContent">
             <AlertDialog.Title className="text-2xl mb-4">
-              Edit account
+              New account
             </AlertDialog.Title>
             <AlertDialog.Description className="my-2 w-full" asChild>
               <div className="grid grid-cols-2 gap-y-4 w-full">
@@ -131,29 +117,23 @@ const EditAccountButton = ({
                   <label htmlFor="username">Username</label>
                   <input
                     id="username"
-                    {...register("username", { disabled: true })}
+                    {...register("username", {
+                      required: "Username is required",
+                    })}
                     className="px-4 py-2 rounded-lg border border-slate-500 disabled:bg-gray-300"
                   />
+                  {errors?.username?.type === "required" && (
+                    <ErrorText>{errors.username.message}</ErrorText>
+                  )}
                 </div>
 
                 <div className="space-y-1 flex flex-col items-start">
                   <label htmlFor="password">Password</label>
                   <input
                     id="password"
-                    {...register("password", {
-                      disabled: !watch("editPassword"),
-                    })}
+                    {...register("password")}
                     className="px-4 py-2 rounded-lg border border-slate-500 disabled:bg-gray-300"
                   />
-
-                  <span className="space-x-4">
-                    <input
-                      type="checkbox"
-                      id="edit-password"
-                      {...register("editPassword")}
-                    />
-                    <label htmlFor="edit-password">Edit password?</label>
-                  </span>
                 </div>
 
                 {/* Form row 2 */}
@@ -170,64 +150,58 @@ const EditAccountButton = ({
                   <label htmlFor="email-password">Email password</label>
                   <input
                     id="email-password"
-                    {...register("emailPassword", {
-                      disabled: !watch("editEmailPassword"),
-                    })}
+                    {...register("emailPassword")}
                     className="px-4 py-2 rounded-lg border border-slate-500 disabled:bg-gray-300"
                   />
-
-                  <span className="space-x-4">
-                    <input
-                      type="checkbox"
-                      id="edit-email-password"
-                      {...register("editEmailPassword")}
-                    />
-                    <label htmlFor="edit-email-password">Edit password?</label>
-                  </span>
                 </div>
 
                 <div className="col-span-2 space-y-1 flex flex-col items-start w-full">
                   <label htmlFor="cookies">Cookies</label>
                   <textarea
                     id="cookies"
-                    {...register("cookies", {
-                      disabled: !watch("editCookies"),
-                    })}
+                    {...register("cookies")}
                     className="px-4 py-2 rounded-lg border border-slate-500 disabled:bg-gray-300 w-1/2"
                   />
-
-                  <span className="space-x-4">
-                    <input
-                      type="checkbox"
-                      id="edit-cookies"
-                      {...register("editCookies")}
-                    />
-                    <label htmlFor="edit-cookies">Edit cookies?</label>
-                  </span>
                 </div>
 
                 <div className="w-full border border-gray-500 col-span-2"></div>
 
                 {/* Form row 3 */}
-                <div className="col-span-2 space-x-4">
-                  <label htmlFor="auto-email-code">
-                    Auto confirm email code?
-                  </label>
-                  <input
-                    type="checkbox"
-                    id="auto-email-code"
-                    {...register("autoConfirmCode")}
-                  />
+                <div className="col-span-2">
+                  <div className="space-x-4">
+                    <label htmlFor="auto-email-code">
+                      Auto confirm email code?
+                    </label>
+                    <input
+                      type="checkbox"
+                      id="auto-email-code"
+                      {...register("autoConfirmCode", {
+                        disabled: !watch("email") && !watch("emailPassword"),
+                      })}
+                      className="disabled:cursor-not-allowed"
+                    />
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    *Email and email&apos;s password are required to enable this
+                  </div>
                 </div>
 
                 {/* Form row 4 */}
-                <div className="col-span-2 space-x-4">
-                  <label htmlFor="try-login">Try login?</label>
-                  <input
-                    type="checkbox"
-                    id="try-login"
-                    {...register("tryLogin")}
-                  />
+                <div className="col-span-2 ">
+                  <div className="space-x-4">
+                    <label htmlFor="try-login">Try login?</label>
+                    <input
+                      type="checkbox"
+                      id="try-login"
+                      {...register("tryLogin", {
+                        disabled: !watch("password") && !watch("cookies"),
+                      })}
+                      className="disabled:cursor-not-allowed"
+                    />
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    *Password or cookies are required to enable this
+                  </div>
                 </div>
               </div>
             </AlertDialog.Description>
@@ -239,7 +213,7 @@ const EditAccountButton = ({
               </AlertDialog.Cancel>
               <AlertDialog.Action type="submit">
                 <Button className="bg-blue-400 hover:bg-blue-500 text-white disabled:bg-gray-300 disabled:hover:bg-gray-300">
-                  Edit
+                  Add account
                 </Button>
               </AlertDialog.Action>
             </div>
@@ -250,4 +224,4 @@ const EditAccountButton = ({
   );
 };
 
-export default EditAccountButton;
+export default AddAccountButton;

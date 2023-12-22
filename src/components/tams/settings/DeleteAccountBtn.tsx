@@ -1,6 +1,9 @@
 import * as AlertDialog from "@radix-ui/react-alert-dialog";
 import Button from "../../common/Button";
-import { ReactElement, useCallback, useRef } from "react";
+import { ReactElement, useCallback, useContext, useRef } from "react";
+import { requestDeleteAccount } from "@/api/tams/account/account";
+import toast from "react-hot-toast";
+import { UserTableUtilities } from "@/app/tams/page";
 
 interface DeleteAccountButtonProps {
   username: string;
@@ -10,6 +13,7 @@ const DeleteAccountButton = ({
   username,
 }: DeleteAccountButtonProps): ReactElement<DeleteAccountButtonProps> => {
   const deleteFormRef = useRef<HTMLDivElement>(null);
+  const { refreshData } = useContext(UserTableUtilities);
 
   const handleOverlayClick = useCallback(() => {
     if (deleteFormRef?.current == null) {
@@ -19,9 +23,17 @@ const DeleteAccountButton = ({
     deleteFormRef.current.setAttribute("data-state", "closed");
   }, []);
 
-  const handleDeleteAccount = () => {
-    // TODO: Integrate with API here
-    console.log(username);
+  const handleDeleteAccount = async () => {
+    toast("Deleting account...", { icon: "⏳" });
+
+    const succeed = await requestDeleteAccount(username);
+    if (!succeed) {
+      toast.error("Faild to delete account. Check log for more info");
+      return;
+    }
+
+    toast.success("Delete account successfully");
+    refreshData();
   };
 
   return (
@@ -51,7 +63,7 @@ const DeleteAccountButton = ({
             </AlertDialog.Cancel>
             <AlertDialog.Action>
               <Button
-                className="bg-red-400 hover:bg-red-500 text-white"
+                className="bg-red-400 hover:bg-red-500 text-white disabled:bg-gray-300 disabled:hover:bg-gray-300"
                 onClick={handleDeleteAccount}
               >
                 Yes, delete account
