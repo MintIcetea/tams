@@ -91,7 +91,7 @@ const EditAccountButton = ({
     <AlertDialog.Root open={isEditFormOpen}>
       <AlertDialog.Trigger asChild>
         <Button
-          className="bg-blue-400 hover:bg-blue-500 text-white"
+          className="bg-blue-500 hover:bg-blue-600 text-white"
           onClick={openEditForm}
         >
           Edit account

@@ -13,7 +13,7 @@ const EditSection = ({
   accountMetadata,
 }: EditSectionProps): ReactElement<EditSectionProps> => {
   return (
-    <div className="w-full h-full">
+    <div className="w-full">
       <div className="font-semibold">Account settings</div>
       <div className="mt-2 space-x-4 flex items-center justify-start">
         <EditAccountButton metadata={accountMetadata} />

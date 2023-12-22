@@ -208,10 +208,12 @@ const TamsPage = () => {
                             ))}
                           </div>
                           <div className="p-4 border border-slate-200">
-                            <EditSection accountMetadata={data} />
-                          </div>
-                          <div className="p-4 border border-slate-200">
-                            <ActionSection />
+                            <div>
+                              <EditSection accountMetadata={data} />
+                            </div>
+                            <div className="mt-4">
+                              <ActionSection />
+                            </div>
                           </div>
                         </div>
                       </Accordion.Content>
