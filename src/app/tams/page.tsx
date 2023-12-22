@@ -161,7 +161,7 @@ const TamsPage = () => {
             </tr>
           </thead>
           <tbody className="tams-tbody">
-            {mockData.map((data) => (
+            {users.map((data) => (
               <Fragment key={data.username}>
                 <tr>
                   <td>{data.username}</td>

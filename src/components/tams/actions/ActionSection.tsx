@@ -12,7 +12,6 @@ interface ActionSectionProps {
   username: string;
 }
 
-// TODO: Call refresh table from context
 const ActionSection = ({
   username,
 }: ActionSectionProps): ReactElement<ActionSectionProps> => {

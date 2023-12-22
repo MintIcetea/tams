@@ -89,7 +89,7 @@ const EditAccountButton = ({
 
   return (
     <AlertDialog.Root open={isEditFormOpen}>
-      <AlertDialog.Trigger asChild>
+      <AlertDialog.Trigger>
         <Button
           className="bg-blue-500 hover:bg-blue-600 text-white"
           onClick={openEditForm}
@@ -107,7 +107,7 @@ const EditAccountButton = ({
             <AlertDialog.Title className="text-2xl mb-4">
               Edit account
             </AlertDialog.Title>
-            <AlertDialog.Description className="my-2 w-full">
+            <AlertDialog.Description className="my-2 w-full" asChild>
               <div className="grid grid-cols-2 gap-y-4 w-full">
                 {/* Form row 1 */}
                 <div className="space-y-1 flex flex-col items-start">

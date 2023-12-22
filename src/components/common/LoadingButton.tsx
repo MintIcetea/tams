@@ -48,7 +48,7 @@ const LoadingButton = ({
   }, [loading]);
 
   const handleClick = async () => {
-    if (!onClick) {
+    if (!onClick || loading) {
       return;
     }
 
@@ -57,10 +57,7 @@ const LoadingButton = ({
   };
 
   return (
-    <div
-      className={clsx("rounded-lg cursor-pointer", className)}
-      onClick={handleClick}
-    >
+    <div className={clsx("rounded-lg cursor-pointer", className)}>
       {loading ? (
         <button
           type="button"
@@ -92,7 +89,7 @@ const LoadingButton = ({
       ) : (
         <div
           className={clsx("px-4 py-2 rounded-lg cursor-pointer", className)}
-          onClick={onClick}
+          onClick={handleClick}
         >
           {children}
         </div>

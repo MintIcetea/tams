@@ -3,11 +3,11 @@ import Button from "../../common/Button";
 import { ReactElement, useCallback, useRef } from "react";
 
 interface DeleteAccountButtonProps {
-  id: string;
+  username: string;
 }
 
 const DeleteAccountButton = ({
-  id,
+  username,
 }: DeleteAccountButtonProps): ReactElement<DeleteAccountButtonProps> => {
   const deleteFormRef = useRef<HTMLDivElement>(null);
 
@@ -21,12 +21,12 @@ const DeleteAccountButton = ({
 
   const handleDeleteAccount = () => {
     // TODO: Integrate with API here
-    console.log(id);
+    console.log(username);
   };
 
   return (
     <AlertDialog.Root>
-      <AlertDialog.Trigger asChild>
+      <AlertDialog.Trigger>
         <Button className="bg-red-400 hover:bg-red-500 text-white">
           Delete account
         </Button>

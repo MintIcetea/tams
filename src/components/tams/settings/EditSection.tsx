@@ -17,7 +17,7 @@ const EditSection = ({
       <div className="font-semibold">Account settings</div>
       <div className="mt-2 space-x-4 flex items-center justify-start">
         <EditAccountButton metadata={accountMetadata} />
-        <DeleteAccountButton id={accountMetadata.username} />
+        <DeleteAccountButton username={accountMetadata.username} />
       </div>
     </div>
   );
