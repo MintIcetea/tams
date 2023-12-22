@@ -209,25 +209,55 @@ const EditAccountButton = ({
                 <div className="w-full border border-gray-500 col-span-2"></div>
 
                 {/* Form row 3 */}
-                <div className="col-span-2 space-x-4">
-                  <label htmlFor="auto-email-code">
-                    Auto confirm email code?
-                  </label>
-                  <input
-                    type="checkbox"
-                    id="auto-email-code"
-                    {...register("autoConfirmCode")}
-                  />
+                <div className="col-span-2">
+                  <div className="space-x-4">
+                    <label htmlFor="auto-email-code">
+                      Auto confirm email code?
+                    </label>
+                    <input
+                      type="checkbox"
+                      id="auto-email-code"
+                      {...register("autoConfirmCode", {
+                        disabled: (() => {
+                          if (watch("editEmailPassword")) {
+                            return !watch("emailPassword") || !watch("email");
+                          }
+
+                          return (
+                            !watch("email") || !metadata.has_email_password
+                          );
+                        })(),
+                      })}
+                      className="disabled:cursor-not-allowed"
+                    />
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    *Email and email&apos;s password are required to enable this
+                  </div>
                 </div>
 
                 {/* Form row 4 */}
-                <div className="col-span-2 space-x-4">
-                  <label htmlFor="try-login">Try login?</label>
-                  <input
-                    type="checkbox"
-                    id="try-login"
-                    {...register("tryLogin")}
-                  />
+                <div className="col-span-2 ">
+                  <div className="space-x-4">
+                    <label htmlFor="try-login">Try login?</label>
+                    <input
+                      type="checkbox"
+                      id="try-login"
+                      {...register("tryLogin", {
+                        disabled: (() => {
+                          if (watch("editPassword")) {
+                            return !watch("password") && !metadata.has_cookies;
+                          }
+
+                          return metadata.has_password || metadata.has_cookies;
+                        })(),
+                      })}
+                      className="disabled:cursor-not-allowed"
+                    />
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    *Password or cookies are required to enable this
+                  </div>
                 </div>
               </div>
             </AlertDialog.Description>
