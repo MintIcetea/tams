@@ -1,23 +1,42 @@
 "use client";
 
+import Button from "@/components/common/Button";
 import TrueFalseIcon from "@/components/common/TrueFalseIcon";
 import ActionSection from "@/components/tams/actions/ActionSection";
 import AddAccountButton from "@/components/tams/settings/AddAccountBtn";
 import EditSection from "@/components/tams/settings/EditSection";
 import { createUsersUtilsContext } from "@/components/tams/table/UserTableContext";
 import { useAccounts } from "@/components/tams/table/useAccounts";
+import { AccountMetadata } from "@/utils/app.type";
 import * as Accordion from "@radix-ui/react-accordion";
 import { useState, useCallback, useEffect, Fragment } from "react";
+import { useForm } from "react-hook-form";
 import { Toaster } from "react-hot-toast";
 
 export const UserTableUtilities = createUsersUtilsContext();
 
+interface SearchFormData {
+  query: string;
+  hasErrorFilter: boolean;
+}
+
 const TamsPage = () => {
   const [loaded, setLoaded] = useState(false);
-
   const [activeUser, setActiveUser] = useState("");
+  const {
+    accounts,
+    bufferAccounts,
+    loadData,
+    setBufferAccounts,
+    resetBufferData,
+  } = useAccounts();
 
-  const { accounts, loadData } = useAccounts();
+  const { register, handleSubmit } = useForm<SearchFormData>({
+    defaultValues: {
+      query: "",
+      hasErrorFilter: false,
+    },
+  });
 
   useEffect(() => {
     setLoaded(true);
@@ -35,14 +54,78 @@ const TamsPage = () => {
     [],
   );
 
+  const handleSearch = (data: SearchFormData) => {
+    const { query, hasErrorFilter } = data;
+
+    if (query.trim() === "" && !hasErrorFilter) {
+      resetBufferData();
+      return;
+    }
+
+    let result: AccountMetadata[] = [];
+    if (query.trim() === "") {
+      result = accounts;
+    } else {
+      result = accounts.filter(
+        (account) =>
+          account.username.includes(query) ||
+          (account.email && account.email.includes(query)),
+      );
+    }
+
+    if (!hasErrorFilter) {
+      setBufferAccounts(result);
+      return;
+    }
+
+    result = result.filter((account) => {
+      if (account.error_reason) {
+        return true;
+      }
+
+      return account.endpoints.some((endpoint) => !!endpoint.error_reason);
+    });
+    setBufferAccounts(result);
+  };
+
   if (!loaded) {
     return null;
   }
 
+  console.log(accounts);
+  console.log(bufferAccounts);
+
   return (
     <div className="container mx-auto mt-24">
-      <div className="my-4">
-        <AddAccountButton refreshData={loadData} />
+      <div>
+        <form onSubmit={handleSubmit(handleSearch)}>
+          <div className="grid grid-cols-3 gap-4 my-4">
+            <div className="col-span-2 flex flex-col items-start space-y-2">
+              <input
+                placeholder="Username or email"
+                {...register("query")}
+                className="px-4 py-2 border border-slate-200 w-full rounded-lg"
+              />
+              <span className="space-x-2">
+                <label htmlFor="has-error-filter">Has error?</label>
+                <input
+                  id="has-error-filter"
+                  type="checkbox"
+                  {...register("hasErrorFilter")}
+                />
+              </span>
+            </div>
+            <div className="space-x-4">
+              <button
+                className="px-4 py-2 rounded-lg cursor-pointer text-white bg-blue-500 hover:bg-blue-600"
+                type="submit"
+              >
+                Search
+              </button>
+              <AddAccountButton refreshData={loadData} />
+            </div>
+          </div>
+        </form>
       </div>
       <Accordion.Root type="single" value={activeUser} collapsible>
         <table className="table-auto w-full h-full border-collapseborder border-slate-400">
@@ -60,7 +143,7 @@ const TamsPage = () => {
             </tr>
           </thead>
           <tbody className="tams-tbody">
-            {accounts.map((data) => (
+            {bufferAccounts.map((data) => (
               <Fragment key={data.username}>
                 <tr>
                   <td>{data.username}</td>

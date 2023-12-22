@@ -5,10 +5,18 @@ import { useCallback, useEffect, useState } from "react";
 export const useAccounts = () => {
   const [accounts, setAccounts] = useState<AccountMetadata[]>([]);
 
+  // For dealing with searching and filtering without affecting source data
+  const [bufferAccounts, setBufferAccounts] = useState<AccountMetadata[]>([]);
+
   const loadData = useCallback(async () => {
     const data = await fetchAllAccounts();
     setAccounts(data);
+    setBufferAccounts(data);
   }, []);
+
+  const resetBufferData = useCallback(() => {
+    setBufferAccounts(accounts);
+  }, [accounts]);
 
   useEffect(() => {
     loadData();
@@ -16,6 +24,9 @@ export const useAccounts = () => {
 
   return {
     accounts,
+    bufferAccounts,
+    resetBufferData,
+    setBufferAccounts,
     loadData,
   };
 };
