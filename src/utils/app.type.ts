@@ -17,7 +17,7 @@ export interface AccountMetadata {
   has_password: boolean;
   has_email_password: boolean;
   has_cookies: boolean;
-  status: string;
+  status: AccountStatus;
   error_reason: string;
   auto_email_confirmation_code: boolean;
   endpoints: AccountEndpoint[];

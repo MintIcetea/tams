@@ -20,10 +20,14 @@ export const requestForceLogin = async (username: string): Promise<boolean> => {
   return true;
 };
 
-export const requestFlow = async (username: string) => {
+export const requestFlow = async (username: string, input?: string) => {
   const path = `/${username}/flow`;
+  let payload = null;
+  if (input) {
+    payload = { input };
+  }
   try {
-    const response = await baseRequest("POST", { path });
+    const response = await baseRequest("POST", { path, payload, json: true });
     if (!response.ok) {
       throw new Error(`Bad response code ${response.status}`);
     }
