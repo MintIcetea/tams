@@ -165,7 +165,7 @@ const TamsPage = () => {
                       className="hover:text-blue-500 hover:underline"
                       onClick={handleRowClick(data.username)}
                     >
-                      See more
+                      {activeUser === data.username ? "See less" : "See more"}
                     </a>
                   </td>
                 </tr>
