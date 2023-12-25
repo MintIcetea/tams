@@ -3,10 +3,10 @@ import {
   requestForceLogin,
   requestRefresh,
 } from "@/api/tams/account/actions";
-import { UserTableUtilities } from "@/app/tams/page";
 import LoadingButton from "@/components/common/LoadingButton";
 import { ReactElement, useContext } from "react";
 import toast from "react-hot-toast";
+import { UserTableUtilities } from "../table/UtilityContext";
 
 interface ActionSectionProps {
   username: string;

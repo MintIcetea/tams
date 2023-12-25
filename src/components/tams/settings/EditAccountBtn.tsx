@@ -1,6 +1,5 @@
 import { requestEditAccount } from "@/api/tams/account/account";
 import { EditAccountPayload } from "@/api/tams/account/type";
-import { UserTableUtilities } from "@/app/tams/page";
 import Button from "@/components/common/Button";
 import { AccountMetadata } from "@/utils/app.type";
 import { useToggle } from "@/utils/hooks/useToggle";
@@ -8,6 +7,7 @@ import * as AlertDialog from "@radix-ui/react-alert-dialog";
 import { ReactElement, useCallback, useContext } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import { UserTableUtilities } from "../table/UtilityContext";
 
 interface EditAccountButtonProps {
   metadata: AccountMetadata;

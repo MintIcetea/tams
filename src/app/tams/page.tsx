@@ -4,15 +4,13 @@ import TrueFalseIcon from "@/components/common/TrueFalseIcon";
 import ActionSection from "@/components/tams/actions/ActionSection";
 import AddAccountButton from "@/components/tams/settings/AddAccountBtn";
 import EditSection from "@/components/tams/settings/EditSection";
-import { createUsersUtilsContext } from "@/components/tams/table/UserTableContext";
+import { UserTableUtilities } from "@/components/tams/table/UtilityContext";
 import { useAccounts } from "@/components/tams/table/useAccounts";
 import { AccountMetadata } from "@/utils/app.type";
 import * as Accordion from "@radix-ui/react-accordion";
 import { useState, useCallback, useEffect, Fragment } from "react";
 import { useForm } from "react-hook-form";
 import { Toaster } from "react-hot-toast";
-
-export const UserTableUtilities = createUsersUtilsContext();
 
 interface SearchFormData {
   query: string;

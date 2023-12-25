@@ -9,3 +9,5 @@ export const createUsersUtilsContext = () => {
     refreshData: () => Promise.resolve(),
   });
 };
+
+export const UserTableUtilities = createUsersUtilsContext();
