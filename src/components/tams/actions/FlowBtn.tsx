@@ -51,6 +51,8 @@ const FlowButton = ({
 
     toast.success("Execution done");
     await refreshData();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [username]);
 
   const requestInputTitle = useMemo(() => {

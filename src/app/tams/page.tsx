@@ -11,7 +11,6 @@ import * as Accordion from "@radix-ui/react-accordion";
 import { useState, useCallback, useEffect, Fragment } from "react";
 import { useForm } from "react-hook-form";
 import { Toaster } from "react-hot-toast";
-import { metadata } from "../layout";
 
 interface SearchFormData {
   query: string;
