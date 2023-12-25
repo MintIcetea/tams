@@ -3,7 +3,7 @@ import Button from "../../common/Button";
 import { ReactElement, useCallback, useContext, useRef } from "react";
 import { requestDeleteAccount } from "@/api/tams/account/account";
 import toast from "react-hot-toast";
-import { UserTableUtilities } from "@/app/tams/page";
+import { UserTableUtilities } from "../table/UtilityContext";
 
 interface DeleteAccountButtonProps {
   username: string;

@@ -8,7 +8,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "format": "prettier --write \"src/**/*.{ts,tsx,js,md}\""
+    "format": "prettier --write \"src/**/*.{ts,tsx,js,md}\"",
+    "docker:start": "docker-compose -p tams -f docker-compose.yaml up",
+    "docker:stop": "docker-compose -p tams -f docker-compose.yaml down"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.1.2",
