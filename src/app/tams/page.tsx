@@ -11,6 +11,7 @@ import * as Accordion from "@radix-ui/react-accordion";
 import { useState, useCallback, useEffect, Fragment } from "react";
 import { useForm } from "react-hook-form";
 import { Toaster } from "react-hot-toast";
+import { metadata } from "../layout";
 
 interface SearchFormData {
   query: string;
@@ -209,7 +210,10 @@ const TamsPage = () => {
                                 <EditSection accountMetadata={data} />
                               </div>
                               <div className="mt-4">
-                                <ActionSection username={data.username} />
+                                <ActionSection
+                                  username={data.username}
+                                  status={data.status}
+                                />
                               </div>
                             </div>
                           </div>

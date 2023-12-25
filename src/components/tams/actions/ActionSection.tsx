@@ -1,19 +1,19 @@
-import {
-  requestFlow,
-  requestForceLogin,
-  requestRefresh,
-} from "@/api/tams/account/actions";
+import { requestForceLogin, requestRefresh } from "@/api/tams/account/actions";
 import LoadingButton from "@/components/common/LoadingButton";
 import { ReactElement, useContext } from "react";
 import toast from "react-hot-toast";
 import { UserTableUtilities } from "../table/UtilityContext";
+import FlowButton from "./FlowBtn";
+import { AccountStatus } from "@/utils/app.type";
 
 interface ActionSectionProps {
   username: string;
+  status: AccountStatus;
 }
 
 const ActionSection = ({
   username,
+  status,
 }: ActionSectionProps): ReactElement<ActionSectionProps> => {
   const { refreshData } = useContext(UserTableUtilities);
 
@@ -27,19 +27,6 @@ const ActionSection = ({
     }
 
     toast.success("Login successfully");
-    await refreshData();
-  };
-
-  const handleFlow = async () => {
-    toast("Executing pre-defiend flow...", { icon: "⏳" });
-
-    const succeed = await requestFlow(username);
-    if (!succeed) {
-      toast.error("Failed to execute flow. Check log for more info");
-      return;
-    }
-
-    toast.success("Execution done");
     await refreshData();
   };
 
@@ -65,12 +52,7 @@ const ActionSection = ({
         >
           Login
         </LoadingButton>
-        <LoadingButton
-          className="bg-blue-500 hover:bg-blue-600 cursor-pointer text-white"
-          onClick={handleFlow}
-        >
-          Run Flow
-        </LoadingButton>
+        <FlowButton username={username} status={status} />
         <LoadingButton
           className="bg-blue-500 hover:bg-blue-600 cursor-pointer text-white"
           onClick={handleRefresh}
