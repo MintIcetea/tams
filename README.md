@@ -33,6 +33,32 @@ npm start
 
 ### Notes
 
+#### Utilities
+
+- Format codebase
+
+```bash
+# Format the whole code base using Prettier
+npm run format
+```
+
+- Lint codebase
+
+```bash
+# Lint the whole coe base using ESLint
+npm run lint
+```
+
+- For docker user
+
+```bash
+# Start application with docker compose
+npm run docker:start
+
+# Stop application with docker compose
+npm run docker:stop
+```
+
 #### Environment variables
 
 - `NEXT_PUBLIC_API_HOST`: Backend server host. Do NOT add trailing `/` at the end
