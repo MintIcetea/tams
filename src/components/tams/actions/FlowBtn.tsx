@@ -85,6 +85,7 @@ const FlowButton = ({
   const handleFlowRequest = async (data: FlowFormData) => {
     const { input } = data;
 
+    handleCloseForm();
     toast("Executing pre-defiend flow...", { icon: "⏳" });
 
     const succeed = await requestFlow(username, input);
