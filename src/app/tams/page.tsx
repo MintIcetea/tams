@@ -6,8 +6,8 @@ import AddAccountButton from "@/components/tams/settings/AddAccountBtn";
 import EditSection from "@/components/tams/settings/EditSection";
 import { UserTableUtilities } from "@/components/tams/table/UtilityContext";
 import { useAccounts } from "@/components/tams/table/useAccounts";
-import { AccountMetadata } from "@/utils/app.type";
 import * as Accordion from "@radix-ui/react-accordion";
+import { debounce } from "lodash";
 import { useState, useCallback, useEffect, Fragment } from "react";
 import { useForm } from "react-hook-form";
 import { Toaster } from "react-hot-toast";
@@ -28,7 +28,7 @@ const TamsPage = () => {
     resetBufferData,
   } = useAccounts();
 
-  const { register, handleSubmit } = useForm<SearchFormData>({
+  const { register, watch } = useForm<SearchFormData>({
     defaultValues: {
       query: "",
       hasErrorFilter: false,
@@ -51,39 +51,61 @@ const TamsPage = () => {
     [],
   );
 
-  const handleSearch = (data: SearchFormData) => {
-    const { query, hasErrorFilter } = data;
+  const handleSearch = useCallback(
+    debounce(
+      (query: string): void => {
+        const hasError = watch("hasErrorFilter");
+        const searchQuery = query.trim();
 
-    if (query.trim() === "" && !hasErrorFilter) {
-      resetBufferData();
-      return;
-    }
+        if (searchQuery === "" && !hasError) {
+          resetBufferData();
+        }
 
-    let result: AccountMetadata[] = [];
-    if (query.trim() === "") {
-      result = accounts;
-    } else {
-      result = accounts.filter(
-        (account) =>
-          account.username.includes(query) ||
-          (account.email && account.email.includes(query)),
-      );
-    }
+        if (searchQuery === "") {
+          if (hasError) {
+            setBufferAccounts(
+              accounts.filter(
+                (account) =>
+                  account.error_reason ||
+                  account.endpoints.some((endpoint) => endpoint.error_reason),
+              ),
+            );
+            return;
+          }
 
-    if (!hasErrorFilter) {
-      setBufferAccounts(result);
-      return;
-    }
+          setBufferAccounts(accounts);
+          return;
+        }
 
-    result = result.filter((account) => {
-      if (account.error_reason) {
-        return true;
-      }
+        if (hasError) {
+          setBufferAccounts(
+            accounts
+              .filter(
+                (account) =>
+                  account.error_reason ||
+                  account.endpoints.some((endpoint) => endpoint.error_reason),
+              )
+              .filter(
+                (account) =>
+                  account.username.includes(searchQuery) ||
+                  account.email.includes(searchQuery),
+              ),
+          );
+        }
 
-      return account.endpoints.some((endpoint) => !!endpoint.error_reason);
-    });
-    setBufferAccounts(result);
-  };
+        setBufferAccounts(
+          accounts.filter(
+            (account) =>
+              account.username.includes(searchQuery) ||
+              account.email.includes(searchQuery),
+          ),
+        );
+      },
+      200,
+      { leading: true },
+    ),
+    [accounts],
+  );
 
   if (!loaded) {
     return null;
@@ -95,12 +117,14 @@ const TamsPage = () => {
         <AddAccountButton refreshData={loadData} />
       </div>
       <div className="my-4">
-        <form onSubmit={handleSubmit(handleSearch)}>
+        <form>
           <div className="grid grid-cols-3 gap-4 my-4">
             <div className="flex flex-col items-start space-y-2">
               <input
                 placeholder="Username or email"
-                {...register("query")}
+                {...register("query", {
+                  onChange: (event) => handleSearch(event.target.value),
+                })}
                 className="px-4 py-2 border border-slate-200 w-full rounded-lg"
               />
               <span className="space-x-2">
@@ -108,17 +132,11 @@ const TamsPage = () => {
                 <input
                   id="has-error-filter"
                   type="checkbox"
-                  {...register("hasErrorFilter")}
+                  {...register("hasErrorFilter", {
+                    onChange: () => handleSearch(watch("query")),
+                  })}
                 />
               </span>
-            </div>
-            <div className="space-x-4">
-              <button
-                className="px-4 py-2 rounded-lg cursor-pointer text-white bg-blue-500 hover:bg-blue-600"
-                type="submit"
-              >
-                Search
-              </button>
             </div>
           </div>
         </form>
