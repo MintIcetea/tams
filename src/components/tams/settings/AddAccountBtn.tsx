@@ -27,13 +27,13 @@ const AddAccountButton = ({
 }: AddAccountButtonProps): ReactElement<AddAccountButtonProps> => {
   const {
     isOpen: isEditFormOpen,
-    open: openEditForm,
-    close: closeEditForm,
+    open: openAddForm,
+    close: closeAddForm,
   } = useToggle();
 
   const handleCloseForm = useCallback(() => {
     reset();
-    closeEditForm();
+    closeAddForm();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -55,10 +55,12 @@ const AddAccountButton = ({
     },
   });
 
-  const handleEditAccount = async (data: AddAccountFormData) => {
-    toast("Adding account...", { icon: "⏳" });
-    closeEditForm();
+  const handleCloseAddForm = () => {
+    reset();
+    closeAddForm();
+  };
 
+  const handleAddAccount = async (data: AddAccountFormData) => {
     const {
       username,
       password,
@@ -68,6 +70,9 @@ const AddAccountButton = ({
       autoConfirmCode,
       tryLogin,
     } = data;
+
+    handleCloseAddForm();
+    toast("Adding account...", { icon: "⏳" });
 
     // Construct request payload based on user input
     const payload: AddAccountPayload = {
@@ -95,7 +100,7 @@ const AddAccountButton = ({
       <AlertDialog.Trigger>
         <Button
           className="bg-blue-500 hover:bg-blue-600 text-white"
-          onClick={openEditForm}
+          onClick={openAddForm}
         >
           Add new account
         </Button>
@@ -105,7 +110,7 @@ const AddAccountButton = ({
           className="AlertDialogOverlay"
           onClick={handleCloseForm}
         />
-        <form onSubmit={handleSubmit(handleEditAccount)}>
+        <form onSubmit={handleSubmit(handleAddAccount)}>
           <AlertDialog.Content className="AlertDialogContent">
             <AlertDialog.Title className="text-2xl mb-4">
               New account
